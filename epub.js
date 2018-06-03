@@ -8,19 +8,26 @@ try {
     var ZipFile = require("zipfile").ZipFile;
 } catch (err) {
     // Mock zipfile using pure-JS adm-zip:
-    var AdmZip = require('adm-zip');
+
+    var JSZip = require("jszip");
 
     var ZipFile = function(filename) {
-        this.admZip = new AdmZip(filename);
-        this.names = this.admZip.getEntries().map(function(zipEntry) {
-            return zipEntry.entryName;
+        var fs = require("fs");
+        var deasync = require('./deasync')
+
+        var data = fs.readFileSync(filename);
+        this.jszip = new JSZip();
+
+        this.zip = deasync(this.jszip.loadAsync(data));
+
+        this.names = Object.keys(this.zip.files).map(function(relativePath) {
+            return relativePath;
         });
+
         this.count = this.names.length;
     };
     ZipFile.prototype.readFile = function(name, cb) {
-        this.admZip.readFileAsync(this.admZip.getEntry(name), function(buffer, error) {
-            // `error` is bogus right now, so let's just drop it.
-            // see https://github.com/cthackers/adm-zip/pull/88
+        this.zip.file(name).async("nodebuffer").then(function(buffer){
             return cb(null, buffer);
         });
     };

@@ -35,7 +35,8 @@
     "books"
   ],
   "dependencies": {
-    "adm-zip": "^0.4.11",
+    "deasync": "^0.1.13",
+    "jszip": "^3.1.5",
     "xml2js": "^0.4.19"
   },
   "optionalDependencies": {
